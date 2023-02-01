@@ -1,0 +1,53 @@
+import csv
+"""schema of csv:
+       ID = (str)
+       Start time = (str)
+       Completion time = (str)
+       Description = (string)
+       Severity 
+       Probability
+       Category
+
+"""
+def create_datastore()->list:
+    severity_dict = {"Emergency": {"Frequent": 16, "Probable": 14, "Likely": 11, "Unlikely": 7},
+                     "Major": {"Frequent": 12, "Probable": 10, "Likely": 8, "Unlikely": 5},
+                     "Minor": {"Frequent": 4, "Probable": 3, "Likely": 2, "Unlikely": 1}}
+    probability_dict = {"Frequent": 4, "Probable": 3, "Likely": 2, "Unlikely": 1}
+    csv_dicts = []
+
+    with open('C:/Users/willi/Downloads/RiskResults.csv', encoding='utf-8-sig') as csvfile:
+        dreader = csv.DictReader(csvfile)
+        data = [row for row in dreader]
+        csv_dicts.append(data)
+
+    return data
+
+def calculate_risk_value(data, severity_dict, probability_dict):
+    for row in data:
+        severity = row["Severity"]
+        probability = row["Probability"]
+        value = severity_dict[severity][probability] + probability_dict[probability]
+        print(value)
+        if value <= 0:
+            print("Logging Error - check the data provided as this threat value is invalid.")
+        elif 0 < value <= 4:
+            print(" Minor issue likely, increasing security is not recommended due to costs involved")
+        elif 5 <= value <= 15:
+            print("Issue will require increase in security and access controls. Adding to Backlog for further planning.")
+        else:
+            print("Major bug or issue - sending email to sysadmin, infosec chief, and IT manager.")
+        return value
+
+def display_description(tracker_data, id):
+    print(tracker_data[id-1]["Description"])
+
+if __name__ == "__main__":
+    tracker_data = create_datastore()
+    severity_dict = {"Emergency": {"Frequent": 16, "Probable": 14, "Likely": 11, "Unlikely": 7},
+                     "Major": {"Frequent": 12, "Probable": 10, "Likely": 8, "Unlikely": 5},
+                     "Minor": {"Frequent": 4, "Probable": 3, "Likely": 2, "Unlikely": 1}}
+    probability_dict = {"Frequent": 4, "Probable": 3, "Likely": 2, "Unlikely": 1}
+    calculate_risk_value(tracker_data, severity_dict, probability_dict)
+    id = int(input("Enter the ID of risk: "))
+    display_description(tracker_data, id)
